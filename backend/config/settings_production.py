@@ -83,7 +83,7 @@ MIDDLEWARE = [
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]
 
-ROOT_URLCONF = "movies_vault.urls"
+ROOT_URLCONF = "config.urls"
 
 TEMPLATES = [
     {
@@ -101,7 +101,7 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = "movies_vault.wsgi.application"
+WSGI_APPLICATION = "config.wsgi.application"
 
 # Database - MongoDB Configuration for Production
 # ===============================================

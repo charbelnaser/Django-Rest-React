@@ -12,16 +12,9 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 
 import os
 from pathlib import Path
-import os
 from datetime import timedelta
 from dotenv import load_dotenv
 
-# Load environment variables
-load_dotenv()
-from dotenv import load_dotenv
-from datetime import timedelta
-
-# Load environment variables
 load_dotenv()
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -98,7 +91,7 @@ INSTALLED_APPS = [
     # Third party apps
     "rest_framework",
     "rest_framework_simplejwt",
-    # "rest_framework_simplejwt.token_blacklist",  # Temporarily disabled for MongoDB compatibility
+    "rest_framework_simplejwt.token_blacklist",
     "corsheaders",
     
     # Local apps
@@ -119,7 +112,7 @@ MIDDLEWARE = [
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]
 
-ROOT_URLCONF = "movies_vault.urls"
+ROOT_URLCONF = "config.urls"
 
 TEMPLATES = [
     {
@@ -137,35 +130,19 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = "movies_vault.wsgi.application"
+WSGI_APPLICATION = "config.wsgi.application"
 
 
-# Database - MongoDB Configuration using MongoEngine
-import mongoengine
-
-# Connect to MongoDB Atlas
-mongoengine.connect(
-    db=os.getenv('MONGODB_DB_NAME', 'movies_vault'),
-    host=os.getenv('MONGODB_URI'),
-    retryWrites=True,
-    w='majority'
-)
-
-# Django still needs a database configuration for admin and auth
-# Using persistent SQLite for Django's built-in apps only
+# Database - PostgreSQL
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'django_admin.sqlite3',  # Persistent file for Django admin
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': os.getenv('DB_NAME', 'movies_vault'),
+        'USER': os.getenv('DB_USER', 'postgres'),
+        'PASSWORD': os.getenv('DB_PASSWORD', ''),
+        'HOST': os.getenv('DB_HOST', 'localhost'),
+        'PORT': os.getenv('DB_PORT', '5432'),
     }
-}
-
-# Skip migrations for our custom apps since we're using MongoEngine
-MIGRATION_MODULES = {
-    'authentication': None,
-    'movies': None,
-    'watchlist': None,
-    'core': None,
 }
 
 
@@ -213,7 +190,7 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 # Django REST Framework
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
-        'authentication.mongo_auth.MongoJWTAuthentication',  # Custom MongoDB JWT auth
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
     ],
     'DEFAULT_PERMISSION_CLASSES': [
         'rest_framework.permissions.AllowAny',  # Allow movies without auth for now
@@ -230,7 +207,7 @@ SIMPLE_JWT = {
     'ACCESS_TOKEN_LIFETIME': timedelta(minutes=60),
     'REFRESH_TOKEN_LIFETIME': timedelta(days=7),
     'ROTATE_REFRESH_TOKENS': True,
-    'BLACKLIST_AFTER_ROTATION': False,  # Disabled for MongoDB compatibility
+    'BLACKLIST_AFTER_ROTATION': True,
     'UPDATE_LAST_LOGIN': True,
     
 

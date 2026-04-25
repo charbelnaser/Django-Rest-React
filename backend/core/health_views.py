@@ -11,7 +11,7 @@ def health_check(request):
     """
     try:
         # Check database connection
-        from authentication.mongo_models import User
+        from authentication.models import User
         db_status = "connected"
         try:
             # Try to count users (this tests MongoDB connection)
@@ -51,7 +51,7 @@ def health_page(request):
     """
     try:
         # Check database connection
-        from authentication.mongo_models import User
+        from authentication.models import User
         try:
             user_count = User.objects.count()
             db_status = "✅ Connected"
@@ -323,8 +323,8 @@ def health_page(request):
                         <div class="card-content">
                             <p><strong>Status:</strong> {db_status.replace('✅ ', '').replace('❌ ', '')}</p>
                             <p><strong>Total Users:</strong> {user_count}</p>
-                            <p><strong>Type:</strong> MongoDB Atlas</p>
-                            <p><strong>Connection:</strong> MongoEngine ODM</p>
+                            <p><strong>Type:</strong> PostgreSQL</p>
+                            <p><strong>Connection:</strong> Django ORM</p>
                         </div>
                     </div>
                     

@@ -18,15 +18,19 @@ class RegisterView(APIView):
     permission_classes = [AllowAny]
     
     def post(self, request):
-        # Check if username already exists
-        username = request.data.get('username')
-        if not username:
+        email = request.data.get('email', '').strip().lower()
+        if not email:
             return Response({
-                'error': 'Username is required.'
+                'error': 'Email is required.'
             }, status=status.HTTP_400_BAD_REQUEST)
-            
-        if User.objects.filter(username=username).exists():
-            print(f"DEBUG: Username '{username}' already exists")  # Debug log
+
+        if User.objects.filter(email=email).exists():
+            return Response({
+                'error': 'Email already exists. Please use another email.'
+            }, status=status.HTTP_400_BAD_REQUEST)
+
+        username = request.data.get('username', '').strip()
+        if username and User.objects.filter(username=username).exists():
             return Response({
                 'error': 'Username already exists. Please choose a different username.'
             }, status=status.HTTP_400_BAD_REQUEST)
@@ -43,8 +47,8 @@ class RegisterView(APIView):
                 'error': 'Password must be at least 8 characters long.'
             }, status=status.HTTP_400_BAD_REQUEST)
         
-        # Check username length
-        if len(username) < 3:
+        # Check username length only if provided
+        if username and len(username) < 3:
             return Response({
                 'error': 'Username must be at least 3 characters long.'
             }, status=status.HTTP_400_BAD_REQUEST)
@@ -52,8 +56,6 @@ class RegisterView(APIView):
         serializer = UserRegistrationSerializer(data=request.data)
         if serializer.is_valid():
             user = serializer.save()
-            user.password = make_password(serializer.validated_data['password'])
-            user.save()
             
             # Create user preferences
             UserPreferences.objects.create(user=user)
@@ -82,13 +84,13 @@ class LoginView(APIView):
     permission_classes = [AllowAny]
     
     def post(self, request):
-        username = request.data.get('username')
+        email = request.data.get('email', '').strip().lower()
         password = request.data.get('password')
         
         # Check if fields are provided
-        if not username:
+        if not email:
             return Response({
-                'error': 'Username is required.'
+                'error': 'Email is required.'
             }, status=status.HTTP_400_BAD_REQUEST)
             
         if not password:
@@ -98,24 +100,21 @@ class LoginView(APIView):
         
         # Check if user exists
         try:
-            user_exists = User.objects.get(username=username)
+            user_exists = User.objects.get(email=email)
         except User.DoesNotExist:
-            print(f"DEBUG: User '{username}' does not exist")  # Debug log
             return Response({
-                'error': 'Username does not exist. Please check your username or sign up.'
+                'error': 'Email does not exist. Please check your email or sign up.'
             }, status=status.HTTP_401_UNAUTHORIZED)
         
         # Check if account is active
         if not user_exists.is_active:
-            print(f"DEBUG: User '{username}' account is disabled")  # Debug log
             return Response({
                 'error': 'Your account has been disabled. Please contact support.'
             }, status=status.HTTP_401_UNAUTHORIZED)
         
         # Authenticate user
-        user = authenticate(request, username=username, password=password)
+        user = authenticate(request, username=user_exists.username, password=password)
         if user:
-            print(f"DEBUG: User '{username}' authenticated successfully")  # Debug log
             refresh = RefreshToken.for_user(user)
             return Response({
                 'user': UserSerializer(user).data,
@@ -124,7 +123,6 @@ class LoginView(APIView):
                 'message': 'Login successful'
             }, status=status.HTTP_200_OK)
         else:
-            print(f"DEBUG: Invalid password for user '{username}'")  # Debug log
             return Response({
                 'error': 'Invalid password. Please check your password.'
             }, status=status.HTTP_401_UNAUTHORIZED)
