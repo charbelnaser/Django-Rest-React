@@ -29,10 +29,10 @@ export const AuthProvider = ({ children }) => {
     setLoading(false);
   }, []);
 
-  const login = async (username, password) => {
+  const login = async (email, password) => {
     try {
       setLoading(true);
-      const response = await apiService.login(username, password);
+      const response = await apiService.login(email, password);
       
       const userData = {
         id: response.user.id,

@@ -1,0 +1,156 @@
+.product-detail-card {
+  max-width: 500px;
+  margin: 40px auto;
+  background: #18181c;
+  border-radius: 16px;
+  box-shadow: 0 4px 24px rgba(0,0,0,0.18);
+  padding: 32px 28px 28px 28px;
+  color: var(--text-primary, #fff);
+  position: relative;
+}
+
+.back-btn {
+  background: none;
+  color: #667eea;
+  border: none;
+  font-size: 1rem;
+  margin-bottom: 18px;
+  cursor: pointer;
+  transition: color 0.2s;
+}
+.back-btn:hover {
+  color: #a084e8;
+}
+
+.detail-title {
+  font-size: 2rem;
+  font-weight: 700;
+  margin-bottom: 24px;
+  text-align: center;
+  letter-spacing: 0.5px;
+}
+
+.product-info {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.product-image-wrap {
+  width: 180px;
+  height: 180px;
+  margin-bottom: 18px;
+  border-radius: 12px;
+  overflow: hidden;
+  background: #23232b;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.product-image {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+.product-fields {
+  width: 100%;
+  margin-bottom: 18px;
+}
+.field-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 7px 0;
+  border-bottom: 1px solid #23232b;
+  font-size: 1.05rem;
+}
+.field-label {
+  color: #a084e8;
+  font-weight: 500;
+}
+.product-actions {
+  display: flex;
+  gap: 16px;
+  justify-content: center;
+  margin-top: 10px;
+}
+.edit-btn, .delete-btn, .save-btn, .cancel-btn {
+  padding: 8px 22px;
+  border-radius: 6px;
+  font-size: 1rem;
+  font-weight: 500;
+  border: none;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s;
+}
+.edit-btn {
+  background: #667eea;
+  color: #fff;
+}
+.edit-btn:hover {
+  background: #a084e8;
+}
+.delete-btn {
+  background: #dc2626;
+  color: #fff;
+}
+.delete-btn:hover {
+  background: #b91c1c;
+}
+.save-btn {
+  background: #22c55e;
+  color: #fff;
+}
+.save-btn:hover {
+  background: #16a34a;
+}
+.cancel-btn {
+  background: #23232b;
+  color: #fff;
+}
+.cancel-btn:hover {
+  background: #18181c;
+}
+.product-edit-form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+.form-row {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.form-row label {
+  font-size: 0.98rem;
+  color: #a084e8;
+  font-weight: 500;
+}
+.form-actions {
+  display: flex;
+  gap: 16px;
+  justify-content: center;
+  margin-top: 10px;
+}
+.spinner-center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 300px;
+}
+.spinner {
+  border: 4px solid #23232b;
+  border-top: 4px solid #667eea;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  animation: spin 1s linear infinite;
+}
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+.error-message {
+  color: #dc2626;
+  text-align: center;
+  margin: 30px 0;
+  font-weight: 500;
+}

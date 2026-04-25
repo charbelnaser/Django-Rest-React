@@ -97,16 +97,16 @@ const Home = () => {
           </div>
         </section>
 
-        {/* Top Rated Movies */}
+        {/* Products */}
         <section className="movies-section">
           <div className="container">
             <div className="section-header">
-              <h2>Top Rated</h2>
+              <h2>Products</h2>
               <button className="btn btn-secondary">View All</button>
             </div>
             <div className="movies-grid">
-              {topRatedMovies.map(movie => (
-                <MovieCard key={movie.id} movie={movie} />
+              {topRatedMovies.map(product => (
+                <MovieCard key={product.id} product={product} />
               ))}
             </div>
           </div>

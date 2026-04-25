@@ -21,7 +21,7 @@ class MoviesVaultAPI {
 
   // ===== AUTHENTICATION METHODS =====
 
-  // Register user with username/password
+  // Register user with email/password
   async register(userData) {
     try {
       const response = await fetch(`${API_BASE_URL}/api/auth/register/`, {
@@ -59,13 +59,13 @@ class MoviesVaultAPI {
     }
   }
 
-  // Login user with username/password
-  async login(username, password) {
+  // Login user with email/password
+  async login(email, password) {
     try {
       const response = await fetch(`${API_BASE_URL}/api/auth/login/`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ username, password })
+        body: JSON.stringify({ email, password })
       });
 
       if (!response.ok) {
@@ -187,23 +187,23 @@ class MoviesVaultAPI {
   }
 
   // Get user's watchlist
-  async getWatchlist(status = null) {
-    const url = status 
-      ? `${API_BASE_URL}/api/watchlist/?status=${status}`
-      : `${API_BASE_URL}/api/watchlist/`;
+  // async getWatchlist(status = null) {
+  //   const url = status 
+  //     ? `${API_BASE_URL}/api/watchlist/?status=${status}`
+  //     : `${API_BASE_URL}/api/watchlist/`;
       
-    const response = await fetch(url, {
-      method: 'GET',
-      headers: this.getHeaders()
-    });
+  //   const response = await fetch(url, {
+  //     method: 'GET',
+  //     headers: this.getHeaders()
+  //   });
 
-    if (!response.ok) {
-      const error = await response.json();
-      throw new Error(error.error || 'Failed to get watchlist');
-    }
+  //   if (!response.ok) {
+  //     const error = await response.json();
+  //     throw new Error(error.error || 'Failed to get watchlist');
+  //   }
 
-    return await response.json();
-  }
+  //   return await response.json();
+  // }
 
   // Check if movie is in watchlist
   async checkWatchlistStatus(movieId) {
@@ -221,19 +221,19 @@ class MoviesVaultAPI {
   }
 
   // Toggle watch status (watched/want to watch)
-  async toggleWatchStatus(movieId) {
-    const response = await fetch(`${API_BASE_URL}/api/watchlist/${movieId}/toggle/`, {
-      method: 'PUT',
-      headers: this.getHeaders()
-    });
+  // async toggleWatchStatus(movieId) {
+  //   const response = await fetch(`${API_BASE_URL}/api/watchlist/${movieId}/toggle/`, {
+  //     method: 'PUT',
+  //     headers: this.getHeaders()
+  //   });
 
-    if (!response.ok) {
-      const error = await response.json();
-      throw new Error(error.error || 'Failed to toggle watch status');
-    }
+  //   if (!response.ok) {
+  //     const error = await response.json();
+  //     throw new Error(error.error || 'Failed to toggle watch status');
+  //   }
 
-    return await response.json();
-  }
+  //   return await response.json();
+  // }
 
   // Get watchlist statistics
   async getWatchlistStats() {
@@ -257,14 +257,14 @@ class MoviesVaultAPI {
     try {
       // First, get popular movies to establish a baseline of trending/popular movies
       const popularResponse = await fetch(
-        `${API_BASE_URL}/api/movies/popular/?page=1`,
+        `${API_BASE_URL}/api/products/products/?page=1`,
         { headers: this.getHeaders() }
       );
       
-      const trendingResponse = await fetch(
-        `${API_BASE_URL}/api/movies/trending/?page=1`,
-        { headers: this.getHeaders() }
-      );
+      // const trendingResponse = await fetch(
+      //   `${API_BASE_URL}/api/products/trending/?page=1`,
+      //   { headers: this.getHeaders() }
+      // );
       
       if (!popularResponse.ok || !trendingResponse.ok) {
         throw new Error('Failed to fetch baseline data');
@@ -301,7 +301,7 @@ class MoviesVaultAPI {
       
       // Now search for the query
       const searchResponse = await fetch(
-        `${API_BASE_URL}/api/movies/search/?query=${encodeURIComponent(query)}&page=1`,
+        `${API_BASE_URL}/api/products/search/?query=${encodeURIComponent(query)}&page=1`,
         { headers: this.getHeaders() }
       );
 
@@ -359,7 +359,7 @@ class MoviesVaultAPI {
       // Fetch first 2 pages to get 40 movies
       for (let page = 1; page <= 2; page++) {
         const response = await fetch(
-          `${API_BASE_URL}/api/movies/popular/?page=${page}`,
+          `${API_BASE_URL}/api/products/popular/?page=${page}`,
           { headers: this.getHeaders() }
         );
 
@@ -395,49 +395,49 @@ class MoviesVaultAPI {
   }
 
   // Get trending movies - fetch up to 40 movies (2 pages)
-  async getTrendingMovies() {
-    const allResults = [];
-    let totalPages = 1;
-    let totalResults = 0;
+  // async getTrendingMovies() {
+  //   const allResults = [];
+  //   let totalPages = 1;
+  //   let totalResults = 0;
     
-    try {
-      // Fetch first 2 pages to get 40 movies
-      for (let page = 1; page <= 2; page++) {
-        const response = await fetch(
-          `${API_BASE_URL}/api/movies/trending/?page=${page}`,
-          { headers: this.getHeaders() }
-        );
+  //   try {
+  //     // Fetch first 2 pages to get 40 movies
+  //     for (let page = 1; page <= 2; page++) {
+  //       const response = await fetch(
+  //         `${API_BASE_URL}/api/products/trending/?page=${page}`,
+  //         { headers: this.getHeaders() }
+  //       );
 
-        if (!response.ok) {
-          throw new Error('Failed to fetch trending movies');
-        }
+  //       if (!response.ok) {
+  //         throw new Error('Failed to fetch trending movies');
+  //       }
 
-        const data = await response.json();
+  //       const data = await response.json();
         
-        if (page === 1) {
-          totalPages = data.total_pages;
-          totalResults = data.total_results;
-        }
+  //       if (page === 1) {
+  //         totalPages = data.total_pages;
+  //         totalResults = data.total_results;
+  //       }
         
-        allResults.push(...data.results);
+  //       allResults.push(...data.results);
         
-        // Stop if we've reached the end of results or got 40 movies
-        if (page >= totalPages || allResults.length >= 40) {
-          break;
-        }
-      }
+  //       // Stop if we've reached the end of results or got 40 movies
+  //       if (page >= totalPages || allResults.length >= 40) {
+  //         break;
+  //       }
+  //     }
       
-      return {
-        results: allResults.slice(0, 40), // Limit to 40 movies
-        total_results: totalResults,
-        total_pages: 1, // Always return 1 page since we're showing all results
-        page: 1
-      };
-    } catch (error) {
-      console.error('Get trending movies error:', error);
-      throw new Error('Failed to fetch trending movies');
-    }
-  }
+  //     return {
+  //       results: allResults.slice(0, 40), // Limit to 40 movies
+  //       total_results: totalResults,
+  //       total_pages: 1, // Always return 1 page since we're showing all results
+  //       page: 1
+  //     };
+  //   } catch (error) {
+  //     console.error('Get trending movies error:', error);
+  //     throw new Error('Failed to fetch trending movies');
+  //   }
+  // }
 
   // Get top rated movies - fetch up to 40 movies (2 pages)
   async getTopRatedMovies() {
@@ -449,7 +449,7 @@ class MoviesVaultAPI {
       // Fetch first 2 pages to get 40 movies
       for (let page = 1; page <= 2; page++) {
         const response = await fetch(
-          `${API_BASE_URL}/api/movies/top-rated/?page=${page}`,
+          `${API_BASE_URL}/api/products/products/?page=${page}`,
           { headers: this.getHeaders() }
         );
 
@@ -484,30 +484,12 @@ class MoviesVaultAPI {
     }
   }
 
-  // Get now playing movies
-  async getNowPlayingMovies(page = 1) {
-    try {
-      const response = await fetch(
-        `${API_BASE_URL}/api/movies/now-playing/?page=${page}`,
-        { headers: this.getHeaders() }
-      );
-
-      if (!response.ok) {
-        throw new Error('Failed to fetch now playing movies');
-      }
-
-      return await response.json();
-    } catch (error) {
-      console.error('Get now playing movies error:', error);
-      throw error;
-    }
-  }
 
   // Get upcoming movies
   async getUpcomingMovies(page = 1) {
     try {
       const response = await fetch(
-        `${API_BASE_URL}/api/movies/upcoming/?page=${page}`,
+        `${API_BASE_URL}/api/products/upcoming/?page=${page}`,
         { headers: this.getHeaders() }
       );
 
@@ -522,30 +504,17 @@ class MoviesVaultAPI {
     }
   }
 
-  // Get movie genres
-  async getGenres() {
-    try {
-      const response = await fetch(
-        `${API_BASE_URL}/api/movies/genres/`,
-        { headers: this.getHeaders() }
-      );
 
-      if (!response.ok) {
-        throw new Error('Failed to fetch genres');
-      }
-
-      return await response.json();
-    } catch (error) {
-      console.error('Get genres error:', error);
-      throw error;
-    }
-  }
 
   // Get movie details by ID
   async getMovieDetails(movieId) {
     try {
-      const response = await fetch(`${API_BASE_URL}/api/movies/${movieId}/`);
-      
+      const response = await fetch(
+        `${API_BASE_URL}/api/products/products/${movieId}/`,
+        { headers: this.getHeaders() }
+      );
+
+     
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
@@ -578,6 +547,7 @@ class MoviesVaultAPI {
 
 // Create and export singleton instance
 const apiService = new MoviesVaultAPI();
+apiService.API_BASE_URL = API_BASE_URL;
 export default apiService;
 
 // Also export with the old name for backward compatibility

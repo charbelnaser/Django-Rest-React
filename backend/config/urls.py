@@ -22,14 +22,15 @@ from core.health_views import health_check, health_page
 
 urlpatterns = [
     path("admin/", admin.site.urls),
-    
     # Health check endpoints (for monitoring and manual checks)
     path("health/", health_check, name="health_check"),
     path("", health_page, name="health_page"),  # Root URL shows health page
-    
     # API routes
     path("api/auth/", include("authentication.urls")),
-    path("api/movies/", include("movies.urls")),
+    path("api/catalog/", include("catalog.urls")),
+    path("api/invoicing/", include("invoicing.urls")),
+    path("api/dashboard/", include("dashboard.urls")),
+    path("api/products/", include("products.urls")),
     path("api/watchlist/", include("watchlist.urls")),
     path("api/core/", include("core.urls")),
 ]

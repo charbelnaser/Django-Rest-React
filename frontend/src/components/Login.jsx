@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
+import PasswordResetRequest from './PasswordResetRequest';
 import { useAuth } from '../context/AuthContext';
 
 const Login = () => {
   const [formData, setFormData] = useState({
-    username: '',
+    email: '',
     password: ''
   });
   const [isLoading, setIsLoading] = useState(false);
@@ -11,6 +12,7 @@ const Login = () => {
   const [showSignup, setShowSignup] = useState(false);
   
   const { login, register } = useAuth();
+  const [showReset, setShowReset] = useState(false);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -34,8 +36,8 @@ const Login = () => {
       return;
     }
 
-    if (formData.username.length < 3) {
-      const errorMsg = 'Username must be at least 3 characters long';
+    if (!formData.email.includes('@')) {
+      const errorMsg = 'Please enter a valid email address';
       setError(errorMsg);
       alert(errorMsg); // Simple popup to ensure visibility
       setIsLoading(false);
@@ -46,12 +48,12 @@ const Login = () => {
       if (showSignup) {
         // Handle registration
         await register({
-          username: formData.username,
+          email: formData.email,
           password: formData.password
         });
       } else {
         // Handle login
-        await login(formData.username, formData.password);
+        await login(formData.email, formData.password);
       }
     } catch (err) {
       // Extract error message from different possible sources
@@ -68,20 +70,20 @@ const Login = () => {
       
       if (showSignup) {
         // SIGNUP ERROR HANDLING - Match exact backend messages and show user-friendly debug info
-        if (errorMessage.includes('Username already exists')) {
-          const errorMsg = `User '${formData.username}' already exists. Use different username.`;
+        if (errorMessage.includes('Email already exists')) {
+          const errorMsg = `Email '${formData.email}' already exists. Use another email.`;
           setError(errorMsg);
           alert(errorMsg); // Simple popup to ensure visibility
         } else if (errorMessage.includes('Password must be at least 8 characters long')) {
           const errorMsg = 'Password must be at least 8 characters long.';
           setError(errorMsg);
           alert(errorMsg); // Simple popup to ensure visibility
-        } else if (errorMessage.includes('Username must be at least 3 characters long')) {
-          const errorMsg = 'Username must be at least 3 characters long.';
+        } else if (errorMessage.includes('valid email')) {
+          const errorMsg = 'Please enter a valid email address.';
           setError(errorMsg);
           alert(errorMsg); // Simple popup to ensure visibility
-        } else if (errorMessage.includes('Username is required')) {
-          const errorMsg = 'Username is required.';
+        } else if (errorMessage.includes('Email is required')) {
+          const errorMsg = 'Email is required.';
           setError(errorMsg);
           alert(errorMsg); // Simple popup to ensure visibility
         } else if (errorMessage.includes('Password is required')) {
@@ -104,20 +106,20 @@ const Login = () => {
         }
       } else {
         // LOGIN ERROR HANDLING - Match exact backend messages and show user-friendly debug info
-        if (errorMessage.includes('Username does not exist')) {
-          const errorMsg = `User '${formData.username}' does not exist. Please check your username or sign up.`;
+        if (errorMessage.includes('Email does not exist')) {
+          const errorMsg = `Email '${formData.email}' does not exist. Please check your email or sign up.`;
           setError(errorMsg);
           alert(errorMsg); // Simple popup to ensure visibility
         } else if (errorMessage.includes('Invalid password')) {
-          const errorMsg = `Invalid password for user '${formData.username}'. Please check your password.`;
+          const errorMsg = `Invalid password for email '${formData.email}'. Please check your password.`;
           setError(errorMsg);
           alert(errorMsg); // Simple popup to ensure visibility
         } else if (errorMessage.includes('account has been disabled')) {
-          const errorMsg = `Account '${formData.username}' has been disabled. Please contact support.`;
+          const errorMsg = `Account '${formData.email}' has been disabled. Please contact support.`;
           setError(errorMsg);
           alert(errorMsg); // Simple popup to ensure visibility
-        } else if (errorMessage.includes('Username is required')) {
-          const errorMsg = 'Username is required.';
+        } else if (errorMessage.includes('Email is required')) {
+          const errorMsg = 'Email is required.';
           setError(errorMsg);
           alert(errorMsg); // Simple popup to ensure visibility
         } else if (errorMessage.includes('Password is required')) {
@@ -144,10 +146,14 @@ const Login = () => {
     setShowSignup(!showSignup);
     setError('');
     setFormData({
-      username: '',
+      email: '',
       password: ''
     });
   };
+
+  if (showReset) {
+    return <PasswordResetRequest />;
+  }
 
   return (
     <div className="login-container">
@@ -187,21 +193,20 @@ const Login = () => {
             )}
 
             <div className="form-group">
-              <label htmlFor="username" className="form-label">Username</label>
+              <label htmlFor="email" className="form-label">Email</label>
               <input
-                type="text"
-                id="username"
-                name="username"
-                value={formData.username}
+                type="email"
+                id="email"
+                name="email"
+                value={formData.email}
                 onChange={handleInputChange}
                 className="form-input"
-                placeholder="Enter your username"
+                placeholder="Enter your email"
                 required
                 disabled={isLoading}
-                minLength="3"
               />
-              {formData.username && formData.username.length < 3 && (
-                <div className="input-error">Username must be at least 3 characters long</div>
+              {formData.email && !formData.email.includes('@') && (
+                <div className="input-error">Please enter a valid email address</div>
               )}
             </div>
 
@@ -242,6 +247,13 @@ const Login = () => {
                   {showSignup ? 'Sign In' : 'Sign Up'}
                 </a>
               </p>
+              {!showSignup && (
+                <p style={{ marginTop: '1rem' }}>
+                  <a href="#" onClick={e => { e.preventDefault(); setShowReset(true); }}>
+                    Forgot Password?
+                  </a>
+                </p>
+              )}
             </div>
           </form>
         </div>

@@ -15,9 +15,9 @@ const Navigation = ({ onHomeClick, onViewChange, currentView, isMobileMenuOpen, 
 
   const navItems = [
     { name: 'Home', id: 'home', active: currentView === 'home' },
-    { name: 'Top Rated', id: 'top-rated', active: currentView === 'top-rated' },
-    { name: 'Trending', id: 'trending', active: currentView === 'trending' },
-    { name: 'My Watchlist', id: 'watchlist', active: currentView === 'watchlist' },
+    { name: 'Products', id: 'top-rated', active: currentView === 'top-rated' },
+    // { name: 'Trending', id: 'trending', active: currentView === 'trending' },
+    // { name: 'My Watchlist', id: 'watchlist', active: currentView === 'watchlist' },
   ];
 
   const handleNavClick = (item) => {

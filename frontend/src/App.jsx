@@ -1,4 +1,7 @@
 import { useEffect, useState } from 'react'
+import { BrowserRouter as Router, Routes, Route, useParams } from 'react-router-dom';
+import ProductDetail from './pages/ProductDetail.jsx';
+import PasswordResetConfirm from './components/PasswordResetConfirm';
 import './App.css'
 import Search from './components/Search.jsx'
 import Spinner from './components/Spinner.jsx'
@@ -9,6 +12,11 @@ import WatchlistPage from './components/WatchlistPage.jsx'
 import { useAuth } from './context/AuthContext'
 import { WatchlistProvider } from './context/WatchlistContext'
 import moviesAPI from './services/api.js'
+
+function PasswordResetConfirmWrapper() {
+  const { token } = useParams();
+  return <PasswordResetConfirm token={token} />;
+}
 
 const App = () => {
   const { isAuthenticated, loading, user, logout } = useAuth();
@@ -53,9 +61,9 @@ const App = () => {
           case 'top-rated':
             data = await moviesAPI.getTopRatedMovies();
             break;
-          case 'trending':
-            data = await moviesAPI.getTrendingMovies();
-            break;
+          // case 'trending':
+          //   data = await moviesAPI.getTrendingMovies();
+          //   break;
           default:
             data = await moviesAPI.getPopularMovies();
         }
@@ -103,10 +111,10 @@ const App = () => {
       return;
     }
     
-    if (viewName === 'watchlist') {
-      setMovieList([]);
-      return;
-    }
+    // if (viewName === 'watchlist') {
+    //   setMovieList([]);
+    //   return;
+    // }
     
     // For other views (top-rated, trending), fetch movies
     await fetchMovies('');
@@ -115,8 +123,8 @@ const App = () => {
   // Get dashboard title based on current view
   const getDashboardTitle = () => {
     switch(currentView) {
-      case 'home': return 'Discover Movies';
-      case 'top-rated': return 'Top Rated Collection';
+      case 'home': return 'Discover Products';
+      case 'top-rated': return 'Products';
       case 'trending': return 'Trending Now';
       case 'watchlist': return 'Your Watchlist';
       default: return 'Movies Vault';
@@ -127,7 +135,7 @@ const App = () => {
   const getSectionTitle = () => {
     switch(currentView) {
       case 'home': return 'Search Results';
-      case 'top-rated': return 'Top Rated Movies';
+      case 'top-rated': return 'Products';
       case 'trending': return 'Trending Movies';
       case 'watchlist': return 'My Watchlist';
       default: return 'Movies';
@@ -149,7 +157,7 @@ const App = () => {
 
   useEffect(() => {
     if (isAuthenticated) {
-      loadTrendingMovies();
+      // loadTrendingMovies();
       // Show welcome message for 3 seconds when user logs in
       setShowWelcome(true);
       const timer = setTimeout(() => {
@@ -170,135 +178,141 @@ const App = () => {
     );
   }
 
+
   if (!isAuthenticated) {
-    return <Login />;
+    return (
+      <Router>
+        <Routes>
+          <Route path="/reset-password/:token" element={<PasswordResetConfirmWrapper />} />
+          <Route path="*" element={<Login />} />
+        </Routes>
+      </Router>
+    );
   }
 
   return (
-    <WatchlistProvider>
-      <div className="dashboard-container">
-      <div className="pattern"/>
-      
-      {/* Welcome Message */}
-      {showWelcome && user && (
-        <div className="welcome-message">
-          <p>Welcome, {user.username}!</p>
-        </div>
-      )}
-      
-      {/* Mobile Header */}
-      <div className="mobile-header">
-        <div className="mobile-title">
-          <span className="movies-text">{getDashboardTitle()}</span>
-        </div>
-        <button 
-          className="mobile-menu-btn"
-          onClick={toggleMobileMenu}
-          aria-label="Toggle menu"
-        >
-          <span className={`hamburger ${isMobileMenuOpen ? 'open' : ''}`}>
-            <span></span>
-            <span></span>
-            <span></span>
-          </span>
-        </button>
-      </div>
-
-      {/* Navigation Sidebar */}
-      <Navigation 
-        onHomeClick={handleHomeClick} 
-        onViewChange={handleViewChange}
-        currentView={currentView}
-        isMobileMenuOpen={isMobileMenuOpen}
-        onMobileClose={() => setIsMobileMenuOpen(false)}
-      />
-
-      {/* Mobile Menu Overlay */}
-      {isMobileMenuOpen && <div className="mobile-overlay" onClick={() => setIsMobileMenuOpen(false)} />}
-
-      {/* Main Content */}
-      <div className="dashboard-content">
-        <div className="dashboard-main">
-          {/* Page Header */}
-          <div className="page-header">
-            <h1 className="page-title">
-              <span className="movies-text">MOVIES</span><span className="vault-text">VAULT</span>
-            </h1>
-            <h2 className="page-subtitle">{getDashboardTitle()}</h2>
+    <Router>
+      <Routes>
+        <Route path="/products/:id" element={
+          <div className="product-detail-page">
+            <ProductDetail />
           </div>
-
-          {/* Search Section - Only show on Home and Watchlist */}
-          {(currentView === 'home' || currentView === 'watchlist') && (
-            <Search 
-              searchTerm={searchTerm} 
-              setSearchTerm={setSearchTerm} 
-              placeholder={currentView === 'watchlist' ? "Search in your watchlist..." : "Search for movies..."}
-            />
-          )}
-
-          {/* Hero Section - Only show on Home when no search term and no search results */}
-          {currentView === 'home' && !searchTerm && movieList.length === 0 && (
-            <section className="hero-section desktop-only">
-              <div className="hero-content">
-                {/* Hero Image */}
-                <div className="hero-image">
-                  <img src="/hero.png" alt="Movies Hero" />
+        } />
+        <Route path="*" element={
+          <WatchlistProvider>
+            <div className="dashboard-container">
+              <div className="pattern"/>
+              {/* Welcome Message */}
+              {showWelcome && user && (
+                <div className="welcome-message">
+                  <p>Welcome, {user.username}!</p>
                 </div>
-                
-                <p className="hero-subtitle">
-                  Explore millions of movies, create your watchlist, and get personalized recommendations
-                </p>
-                
-                {/* Hero Action Buttons */}
-                <div className="hero-buttons">
-                  <button 
-                    className="hero-btn"
-                    onClick={() => handleViewChange('top-rated')}
-                  >
-                    Top Rated
-                  </button>
-                  <button 
-                    className="hero-btn"
-                    onClick={() => handleViewChange('trending')}
-                  >
-                    Trending
-                  </button>
-                  <button 
-                    className="hero-btn"
-                    onClick={() => handleViewChange('watchlist')}
-                  >
-                    My Watchlist
-                  </button>
+              )}
+              {/* Mobile Header */}
+              <div className="mobile-header">
+                <div className="mobile-title">
+                  <span className="movies-text">{getDashboardTitle()}</span>
+                </div>
+                <button 
+                  className="mobile-menu-btn"
+                  onClick={toggleMobileMenu}
+                  aria-label="Toggle menu"
+                >
+                  <span className={`hamburger ${isMobileMenuOpen ? 'open' : ''}`}>
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                  </span>
+                </button>
+              </div>
+              {/* Navigation Sidebar */}
+              <Navigation 
+                onHomeClick={handleHomeClick} 
+                onViewChange={handleViewChange}
+                currentView={currentView}
+                isMobileMenuOpen={isMobileMenuOpen}
+                onMobileClose={() => setIsMobileMenuOpen(false)}
+              />
+              {/* Mobile Menu Overlay */}
+              {isMobileMenuOpen && <div className="mobile-overlay" onClick={() => setIsMobileMenuOpen(false)} />}
+              {/* Main Content */}
+              <div className="dashboard-content">
+                <div className="dashboard-main">
+                  {/* Page Header */}
+                  <div className="page-header">
+                    <h2 className="page-subtitle">{getDashboardTitle()}</h2>
+                  </div>
+                  {/* Search Section - Only show on Home and Watchlist */}
+                  {(currentView === 'home' || currentView === 'watchlist') && (
+                    <Search 
+                      searchTerm={searchTerm} 
+                      setSearchTerm={setSearchTerm} 
+                      placeholder={currentView === 'watchlist' ? "Search in your watchlist..." : "Search for ..."}
+                    />
+                  )}
+                  {/* Hero Section - Only show on Home when no search term and no search results */}
+                  {currentView === 'home' && !searchTerm && movieList.length === 0 && (
+                    <section className="hero-section desktop-only">
+                      <div className="hero-content">
+                        {/* Hero Image */}
+                        <div className="hero-image">
+                          <img src="/hero.png" alt="Movies Hero" />
+                        </div>
+                        <p className="hero-subtitle">
+                          Explore millions of movies, create your watchlist, and get personalized recommendations
+                        </p>
+                        {/* Hero Action Buttons */}
+                        <div className="hero-buttons">
+                          <button 
+                            className="hero-btn"
+                            onClick={() => handleViewChange('top-rated')}
+                          >
+                            top-rated
+                          </button>
+                          <button 
+                            className="hero-btn"
+                            onClick={() => handleViewChange('trending')}
+                          >
+                            Trending
+                          </button>
+                          <button 
+                            className="hero-btn"
+                            onClick={() => handleViewChange('watchlist')}
+                          >
+                            My Watchlist
+                          </button>
+                        </div>
+                      </div>
+                    </section>
+                  )}
+                  {/* Movies Section - Show title only if there are movies or loading */}
+                  {currentView === 'watchlist' ? (
+                    <WatchlistPage />
+                  ) : (movieList.length > 0 || isLoading || errorMessage) && (
+                    <section className="all-movies">
+                      <h2>{getSectionTitle()}</h2>
+                    {isLoading ? (
+                      <Spinner />
+                    ) : errorMessage ? (
+                      <p className="text-red-500">{errorMessage}</p>
+                    ) : (
+                      <>
+                        <ul>
+                          {movieList.map((product) => (
+                            <MovieCard key={product.id} product={product} />
+                          ))}
+                        </ul>
+                      </>
+                    )}
+                  </section>
+                  )}
                 </div>
               </div>
-            </section>
-          )}
-
-          {/* Movies Section - Show title only if there are movies or loading */}
-          {currentView === 'watchlist' ? (
-            <WatchlistPage />
-          ) : (movieList.length > 0 || isLoading || errorMessage) && (
-            <section className="all-movies">
-              <h2>{getSectionTitle()}</h2>
-            {isLoading ? (
-              <Spinner />
-            ) : errorMessage ? (
-              <p className="text-red-500">{errorMessage}</p>
-            ) : (
-              <>
-                <ul>
-                  {movieList.map((movie) => (
-                    <MovieCard key={movie.id} movie={movie} />
-                  ))}
-                </ul>
-              </>
-            )}
-          </section>
-          )}
-        </div>
-      </div>
-    </div>
-    </WatchlistProvider>
+            </div>
+          </WatchlistProvider>
+        } />
+      </Routes>
+    </Router>
   );
 };
 
