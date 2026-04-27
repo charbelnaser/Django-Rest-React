@@ -252,100 +252,27 @@ class MoviesVaultAPI {
 
   // ===== TMDB MOVIE API METHODS =====
 
-  // Search movies - fetch top 20 movies with advanced sorting
+  // Search products - fetch by query from backend
   async searchMovies(query) {
     try {
-      // First, get popular movies to establish a baseline of trending/popular movies
-      const popularResponse = await fetch(
-        `${API_BASE_URL}/api/products/products/?page=1`,
-        { headers: this.getHeaders() }
-      );
-      
-      // const trendingResponse = await fetch(
-      //   `${API_BASE_URL}/api/products/trending/?page=1`,
-      //   { headers: this.getHeaders() }
-      // );
-      
-      if (!popularResponse.ok || !trendingResponse.ok) {
-        throw new Error('Failed to fetch baseline data');
-      }
-      
-      const popularData = await popularResponse.json();
-      const trendingData = await trendingResponse.json();
-      
-      // Combine popular and trending for baseline scoring
-      const baselineMovies = new Map();
-      
-      // Add trending movies with higher weight
-      trendingData.results?.forEach((movie, index) => {
-        baselineMovies.set(movie.id, {
-          ...movie,
-          trending_score: 100 - index, // Higher score for higher position
-          is_trending: true
-        });
-      });
-      
-      // Add popular movies with lower weight
-      popularData.results?.forEach((movie, index) => {
-        if (baselineMovies.has(movie.id)) {
-          baselineMovies.get(movie.id).popular_score = 50 - index;
-        } else {
-          baselineMovies.set(movie.id, {
-            ...movie,
-            popular_score: 50 - index,
-            trending_score: 0,
-            is_trending: false
-          });
-        }
-      });
-      
-      // Now search for the query
       const searchResponse = await fetch(
-        `${API_BASE_URL}/api/products/search/?query=${encodeURIComponent(query)}&page=1`,
+        `${API_BASE_URL}/api/products/products/search/?query=${encodeURIComponent(query)}`,
         { headers: this.getHeaders() }
       );
-
       if (!searchResponse.ok) {
-        throw new Error('Failed to search movies');
+        throw new Error('Failed to search products');
       }
-
       const searchData = await searchResponse.json();
-      
-      // Enhance search results with baseline scores and sort
-      const enhancedResults = searchData.results?.map(movie => {
-        const baseline = baselineMovies.get(movie.id);
-        return {
-          ...movie,
-          trending_score: baseline?.trending_score || 0,
-          popular_score: baseline?.popular_score || 0,
-          is_trending: baseline?.is_trending || false,
-          combined_score: (baseline?.trending_score || 0) + (baseline?.popular_score || 0) + (movie.popularity / 100)
-        };
-      }) || [];
-      
-      // Sort by combined score (trending + popular + TMDB popularity)
-      enhancedResults.sort((a, b) => {
-        // First by trending status
-        if (a.is_trending !== b.is_trending) {
-          return b.is_trending - a.is_trending;
-        }
-        // Then by combined score
-        if (b.combined_score !== a.combined_score) {
-          return b.combined_score - a.combined_score;
-        }
-        // Finally by vote average
-        return b.vote_average - a.vote_average;
-      });
-      
+      // Return as results array for compatibility
       return {
-        results: enhancedResults.slice(0, 20), // Limit to top 20 movies
-        total_results: searchData.total_results,
-        total_pages: 1, // Always return 1 page since we're showing all results
+        results: Array.isArray(searchData) ? searchData : [],
+        total_results: Array.isArray(searchData) ? searchData.length : 0,
+        total_pages: 1,
         page: 1
       };
     } catch (error) {
-      console.error('Search movies error:', error);
-      throw new Error('Failed to search movies');
+      console.error('Search products error:', error);
+      throw new Error('Failed to search products');
     }
   }
 

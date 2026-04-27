@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { BrowserRouter as Router, Routes, Route, useParams } from 'react-router-dom';
 import ProductDetail from './pages/ProductDetail.jsx';
+import InvoicePage from './pages/InvoicePage.jsx';
 import PasswordResetConfirm from './components/PasswordResetConfirm';
 import './App.css'
 import Search from './components/Search.jsx'
@@ -198,6 +199,7 @@ const App = () => {
             <ProductDetail />
           </div>
         } />
+        <Route path="/invoices" element={<InvoicePage />} />
         <Route path="*" element={
           <WatchlistProvider>
             <div className="dashboard-container">
@@ -259,10 +261,10 @@ const App = () => {
                           <img src="/hero.png" alt="Movies Hero" />
                         </div>
                         <p className="hero-subtitle">
-                          Explore millions of movies, create your watchlist, and get personalized recommendations
+                          Explore millions of products
                         </p>
                         {/* Hero Action Buttons */}
-                        <div className="hero-buttons">
+                        {/* <div className="hero-buttons">
                           <button 
                             className="hero-btn"
                             onClick={() => handleViewChange('top-rated')}
@@ -281,7 +283,7 @@ const App = () => {
                           >
                             My Watchlist
                           </button>
-                        </div>
+                        </div> */}
                       </div>
                     </section>
                   )}

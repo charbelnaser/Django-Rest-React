@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import BulkImportButton from './BulkImportButton';
 import { useAuth } from '../context/AuthContext';
 
 const Navigation = ({ onHomeClick, onViewChange, currentView, isMobileMenuOpen, onMobileClose }) => {
@@ -16,6 +17,7 @@ const Navigation = ({ onHomeClick, onViewChange, currentView, isMobileMenuOpen, 
   const navItems = [
     { name: 'Home', id: 'home', active: currentView === 'home' },
     { name: 'Products', id: 'top-rated', active: currentView === 'top-rated' },
+    { name: 'Invoices', id: 'invoices', active: currentView === 'invoices' },
     // { name: 'Trending', id: 'trending', active: currentView === 'trending' },
     // { name: 'My Watchlist', id: 'watchlist', active: currentView === 'watchlist' },
   ];
@@ -31,6 +33,7 @@ const Navigation = ({ onHomeClick, onViewChange, currentView, isMobileMenuOpen, 
       onMobileClose();
     }
   };
+
 
   return (
     <>
@@ -48,16 +51,33 @@ const Navigation = ({ onHomeClick, onViewChange, currentView, isMobileMenuOpen, 
         <ul className="nav-menu">
           {navItems.map((item, index) => (
             <li key={index} className="nav-item">
-              <a 
-                href="#" 
-                className={`nav-link ${item.active ? 'active' : ''}`}
-                onClick={(e) => {
-                  e.preventDefault();
-                  handleNavClick(item);
-                }}
-              >
-                {item.name}
-              </a>
+              {item.id === 'invoices' ? (
+                <a
+                  href="/invoices"
+                  className={`nav-link ${item.active ? 'active' : ''}`}
+                  onClick={(e) => {
+                    e.preventDefault();
+                    window.location.href = '/invoices';
+                  }}
+                >
+                  {item.name}
+                </a>
+              ) : (
+                <a 
+                  href="#" 
+                  className={`nav-link ${item.active ? 'active' : ''}`}
+                  onClick={(e) => {
+                    e.preventDefault();
+                    handleNavClick(item);
+                  }}
+                >
+                  {item.name}
+                </a>
+              )}
+              {/* Add BulkImportButton under Products for admin users */}
+              {item.id === 'top-rated'  && (
+                <BulkImportButton />
+              )}
             </li>
           ))}
         </ul>

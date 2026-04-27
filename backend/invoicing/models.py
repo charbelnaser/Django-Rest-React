@@ -23,8 +23,32 @@ class Invoice(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
+    # Soft delete fields
+    is_deleted = models.BooleanField(default=False)
+    deleted_at = models.DateTimeField(null=True, blank=True)
+    deleted_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        related_name="deleted_invoices"
+    )
+
     class Meta:
         ordering = ["-created_at"]
+
+
+# Audit log for Invoice changes
+class InvoiceAuditLog(models.Model):
+    invoice = models.ForeignKey(Invoice, on_delete=models.CASCADE, related_name="audit_logs")
+    changed_by = models.ForeignKey(settings.AUTH_USER_MODEL, null=True, blank=True, on_delete=models.SET_NULL)
+    changed_at = models.DateTimeField(auto_now_add=True)
+    field = models.CharField(max_length=100)
+    old_value = models.TextField(null=True, blank=True)
+    new_value = models.TextField(null=True, blank=True)
+
+    def __str__(self):
+        return f"{self.invoice.number} - {self.field} changed by {self.changed_by} at {self.changed_at}"
 
     def __str__(self):
         return self.number

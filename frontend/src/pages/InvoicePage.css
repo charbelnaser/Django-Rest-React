@@ -1,0 +1,59 @@
+.invoice-page {
+  max-width: 500px;
+  margin: 40px auto;
+  background: #18181c;
+  border-radius: 16px;
+  box-shadow: 0 4px 24px rgba(0,0,0,0.18);
+  padding: 32px 28px 28px 28px;
+  color: var(--text-primary, #fff);
+  position: relative;
+}
+
+.invoice-page label {
+  display: block;
+  margin-top: 18px;
+  margin-bottom: 6px;
+  font-weight: 500;
+}
+
+.invoice-page input[type="text"],
+.invoice-page input[type="number"] {
+  width: 100%;
+  padding: 8px 10px;
+  border-radius: 6px;
+  border: 1px solid #23232b;
+  background: #23232b;
+  color: #fff;
+  margin-bottom: 8px;
+}
+
+.invoice-page button {
+  background: #667eea;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  padding: 8px 18px;
+  margin-top: 12px;
+  margin-right: 8px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: background 0.2s;
+}
+.invoice-page button:hover {
+  background: #a084e8;
+}
+
+.invoice-page .products-list > div {
+  margin-bottom: 8px;
+}
+
+.invoice-page strong {
+  display: inline-block;
+  min-width: 90px;
+}
+
+.invoice-page a {
+  color: #667eea;
+  text-decoration: underline;
+  margin-left: 10px;
+}
